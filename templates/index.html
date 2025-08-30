@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Content Analyzer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .upload-section {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px dashed #e0e6ff;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #4facfe;
+            background: #f0f4ff;
+        }
+
+        .upload-area {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .drag-drop-area {
+            border: 3px dashed #d1d9ff;
+            border-radius: 12px;
+            padding: 40px 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+
+        .drag-drop-area:hover, .drag-drop-area.dragover {
+            border-color: #4facfe;
+            background: #f8faff;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #4facfe;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .text-input-section {
+            background: #fff5f5;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid #ffe6e6;
+        }
+
+        .textarea {
+            width: 100%;
+            min-height: 200px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1rem;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #4facfe;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: #f9fafb;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .result-card h3 {
+            color: #374151;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #4facfe;
+        }
+
+        .sentiment-indicator {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .sentiment-positive {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .sentiment-negative {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .sentiment-neutral {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .suggestions-list {
+            list-style: none;
+        }
+
+        .suggestions-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .suggestions-list li:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-icon {
+            color: #10b981;
+            font-size: 1.1rem;
+            margin-top: 2px;
+        }
+
+        .extracted-text {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .error {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .success {
+            background: #f0fdf4;
+            color: #166534;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            margin: 20px 0;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .file-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .common-words {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .word-item {
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .word-count {
+            background: #4facfe;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Social Media Content Analyzer</h1>
+            <p>Upload documents or paste text to get engagement improvement suggestions</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <h2><i class="fas fa-upload"></i> Upload Document</h2>
+                <div class="upload-area">
+                    <div class="drag-drop-area" id="dragDropArea">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p class="upload-text">Drag and drop your file here or click to browse</p>
+                        <p style="font-size: 0.9rem; color: #999;">Supported formats: PDF, JPG, PNG, GIF, BMP, TIFF</p>
+                        <input type="file" id="fileInput" class="file-input" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff">
+                    </div>
+                    <div class="file-info" id="fileInfo">
+                        <p><i class="fas fa-file"></i> Selected: <span id="fileName"></span></p>
+                    </div>
+                </div>
+                <button class="btn" id="uploadBtn" disabled>
+                    <i class="fas fa-upload"></i> Upload & Analyze
+                </button>
+            </div>
+
+            <div class="text-input-section">
+                <h2><i class="fas fa-edit"></i> Direct Text Analysis</h2>
+                <textarea class="textarea" id="textInput" placeholder="Paste your social media content here for analysis...
+
+Example: Just launched our new product! 🚀 What do you think about the features? #innovation #startup #tech"></textarea>
+                <button class="btn" id="analyzeBtn" style="margin-top: 15px;">
+                    <i class="fas fa-chart-bar"></i> Analyze Text
+                </button>
+            </div>
+        </div>
+
+        <div class="error" id="errorMsg"></div>
+        <div class="success" id="successMsg"></div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing your content...</p>
+        </div>
+
+        <div class="results" id="results">
+            <div class="results-header">
+                <i class="fas fa-analytics"></i>
+                <h2>Analysis Results</h2>
+            </div>
+
+            <div id="extractedTextSection" style="display: none;">
+                <h3><i class="fas fa-file-text"></i> Extracted Text</h3>
+                <div class="extracted-text" id="extractedText"></div>
+            </div>
+
+            <div class="results-grid">
+                <div class="result-card">
+                    <h3><i class="fas fa-chart-pie"></i> Content Statistics</h3>
+                    <div id="statisticsContent"></div>
+                </div>
+
+                <div class="result-card">
+                    <h3><i class="fas fa-heart"></i> Sentiment Analysis</h3>
+                    <div id="sentimentContent"></div>
+                </div>
+
+                <div class="result-card">
+                    <h3><i class="fas fa-hashtag"></i> Social Elements</h3>
+                    <div id="socialContent"></div>
+                </div>
+
+                <div class="result-card">
+                    <h3><i class="fas fa-comments"></i> Top Words</h3>
+                    <div id="wordsContent"></div>
+                </div>
+            </div>
+
+            <div class="result-card" style="margin-top: 20px;">
+                <h3><i class="fas fa-lightbulb"></i> Engagement Suggestions</h3>
+                <ul class="suggestions-list" id="suggestionsList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dragDropArea = document.getElementById('dragDropArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const textInput = document.getElementById('textInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+
+        // Drag and drop functionality
+        dragDropArea.addEventListener('click', () => fileInput.click());
+        
+        dragDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragDropArea.classList.add('dragover');
+        });
+
+        dragDropArea.addEventListener('dragleave', () => {
+            dragDropArea.classList.remove('dragover');
+        });
+
+        dragDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragDropArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        });
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                fileName.textContent = file.name;
+                fileInfo.style.display = 'block';
+                uploadBtn.disabled = false;
+            } else {
+                fileInfo.style.display = 'none';
+                uploadBtn.disabled = true;
+            }
+        }
+
+        // Upload file functionality
+        uploadBtn.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            showLoading();
+            hideMessages();
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                    showSuccess('File processed successfully!');
+                } else {
+                    showError(data.error || 'Upload failed');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Analyze text functionality
+        analyzeBtn.addEventListener('click', async () => {
+            const text = textInput.value.trim();
+            if (!text) {
+                showError('Please enter some text to analyze');
+                return;
+            }
+
+            showLoading();
+            hideMessages();
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults({ analysis: data.analysis, extracted_text: text });
+                    showSuccess('Text analyzed successfully!');
+                } else {
+                    showError(data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        function displayResults(data) {
+            const analysis = data.analysis;
+            
+            // Show extracted text if available
+            if (data.extracted_text) {
+                document.getElementById('extractedTextSection').style.display = 'block';
+                document.getElementById('extractedText').textContent = data.extracted_text;
+            }
+
+            // Statistics
+            const statsHtml = `
+                <div class="stat-item">
+                    <span>Word Count</span>
+                    <span class="stat-value">${analysis.statistics.word_count}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Character Count</span>
+                    <span class="stat-value">${analysis.statistics.character_count}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Sentences</span>
+                    <span class="stat-value">${analysis.statistics.sentence_count}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Readability Score</span>
+                    <span class="stat-value">${analysis.statistics.readability_score}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Grade Level</span>
+                    <span class="stat-value">${analysis.statistics.grade_level}</span>
+                </div>
+            `;
+
+            // Sentiment
+            const sentimentClass = analysis.sentiment.overall.toLowerCase();
+            const sentimentHtml = `
+                <div class="stat-item">
+                    <span>Overall Sentiment</span>
+                    <span class="sentiment-indicator sentiment-${sentimentClass}">${analysis.sentiment.overall}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Positive Score</span>
+                    <span class="stat-value">${analysis.sentiment.positive}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Neutral Score</span>
+                    <span class="stat-value">${analysis.sentiment.neutral}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Negative Score</span>
+                    <span class="stat-value">${analysis.sentiment.negative}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Compound Score</span>
+                    <span class="stat-value">${analysis.sentiment.compound}</span>
+                </div>
+            `;
+
+            // Social Elements
+            const hashtagsHtml = analysis.social_elements.hashtags.length > 0 ? 
+                `<div class="tags">${analysis.social_elements.hashtags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : 
+                '<p style="color: #999; font-style: italic;">No hashtags found</p>';
+            
+            const mentionsHtml = analysis.social_elements.mentions.length > 0 ? 
+                `<div class="tags">${analysis.social_elements.mentions.map(mention => `<span class="tag">${mention}</span>`).join('')}</div>` : 
+                '<p style="color: #999; font-style: italic;">No mentions found</p>';
+
+            const socialHtml = `
+                <div class="stat-item">
+                    <span>Hashtag Count</span>
+                    <span class="stat-value">${analysis.social_elements.hashtag_count}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Mention Count</span>
+                    <span class="stat-value">${analysis.social_elements.mention_count}</span>
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Hashtags:</strong>
+                    ${hashtagsHtml}
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Mentions:</strong>
+                    ${mentionsHtml}
+                </div>
+            `;
+
+            // Common Words
+            const wordsHtml = analysis.common_words.length > 0 ?
+                `<div class="common-words">
+                    ${analysis.common_words.map(([word, count]) => 
+                        `<div class="word-item">
+                            <span>${word}</span>
+                            <span class="word-count">${count}</span>
+                        </div>`
+                    ).join('')}
+                </div>` :
+                '<p style="color: #999; font-style: italic;">No common words found</p>';
+
+            // Suggestions
+            const suggestionsHtml = analysis.suggestions.map(suggestion => 
+                `<li>
+                    <i class="fas fa-check-circle suggestion-icon"></i>
+                    <span>${suggestion}</span>
+                </li>`
+            ).join('');
+
+            // Update DOM
+            document.getElementById('statisticsContent').innerHTML = statsHtml;
+            document.getElementById('sentimentContent').innerHTML = sentimentHtml;
+            document.getElementById('socialContent').innerHTML = socialHtml;
+            document.getElementById('wordsContent').innerHTML = wordsHtml;
+            document.getElementById('suggestionsList').innerHTML = suggestionsHtml;
+
+            // Show results
+            results.style.display = 'block';
+            results.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showLoading() {
+            loading.style.display = 'block';
+            uploadBtn.disabled = true;
+            analyzeBtn.disabled = true;
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+            uploadBtn.disabled = fileInput.files.length === 0;
+            analyzeBtn.disabled = false;
+        }
+
+        function showError(message) {
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+            successMsg.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            successMsg.textContent = message;
+            successMsg.style.display = 'block';
+            errorMsg.style.display = 'none';
+        }
+
+        function hideMessages() {
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+        }
+
+        // Enable analyze button when text is entered
+        textInput.addEventListener('input', () => {
+            analyzeBtn.disabled = textInput.value.trim().length === 0;
+        });
+    </script>
+</body>
+</html>
