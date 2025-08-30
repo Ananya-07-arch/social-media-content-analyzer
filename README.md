@@ -164,9 +164,11 @@ Analyze text content directly
 This project is licensed under the MIT License.
 
 ## Contact
-- **GitHub**: [@yourusername](https://github.com/yourusername)
-- **Email**: your.email@example.com
+- **GitHub**: [Ananya-07-arch](https://github.com/yourusername)
+- **Email**: ananyasrivastava0304@gmail.com
+  
 
 ---
 
 *This project demonstrates full-stack development capabilities including document processing, natural language processing, and modern web application architecture.*
+
