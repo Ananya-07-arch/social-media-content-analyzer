@@ -1,37 +1,6 @@
 # Social Media Content Analyzer
 
-🔗 **Live Demo**: [Coming Soon - Deploy on Railway/Heroku]  
-📁 **GitHub Repository**: https:/Ananya-07-arch/github.com/e/social-media-content-analyzer
-
 A web application that analyzes social media posts and suggests engagement improvements through document upload (PDF, images) or direct text input.
-
-## 🎯 **Technical Assessment Project**
-This project was developed as part of a Software Engineering technical assessment, demonstrating:
-- Full-stack web development skills
-- Document processing and OCR capabilities
-- Natural language processing and sentiment analysis
-- Modern UI/UX design
-- Production-ready code architecture
-
-## 🚀 **Quick Start**
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/social-media-content-analyzer.git
-cd social-media-content-analyzer
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the application
-python app.py
-```
-
-Visit `http://localhost:5000` to use the application.
 
 ## Features
 
@@ -86,7 +55,7 @@ Visit `http://localhost:5000` to use the application.
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/social-media-content-analyzer.git
+   git clone <your-repo-url>
    cd social-media-content-analyzer
    ```
 
@@ -105,6 +74,16 @@ Visit `http://localhost:5000` to use the application.
    ```python
    import nltk
    nltk.download('vader_lexicon')
+   ```
+
+5. **Create templates directory**
+   ```bash
+   mkdir templates
+   ```
+   
+6. **Move index.html to templates folder**
+   ```bash
+   mv index.html templates/
    ```
 
 ## Running the Application
@@ -137,12 +116,103 @@ social-media-content-analyzer/
 ### POST /upload
 Upload and analyze document files (PDF or images)
 
+**Request**: 
+- Multipart form data with file field
+
+**Response**:
+```json
+{
+  "success": true,
+  "filename": "document.pdf",
+  "extracted_text": "extracted text content...",
+  "analysis": {
+    "statistics": {...},
+    "sentiment": {...},
+    "social_elements": {...},
+    "common_words": [...],
+    "suggestions": [...]
+  }
+}
+```
+
 ### POST /analyze
 Analyze text content directly
 
-## Screenshots
+**Request**:
+```json
+{
+  "text": "Your social media content here..."
+}
+```
 
-![Application Demo](screenshot.png) *Coming Soon*
+**Response**:
+```json
+{
+  "success": true,
+  "analysis": {
+    "statistics": {...},
+    "sentiment": {...},
+    "social_elements": {...},
+    "common_words": [...],
+    "suggestions": [...]
+  }
+}
+```
+
+## Features Breakdown
+
+### Text Statistics
+- Word count, character count, sentence count
+- Flesch Reading Ease score (0-100, higher = easier to read)
+- Flesch-Kincaid Grade Level (reading grade level required)
+
+### Sentiment Analysis
+- NLTK VADER sentiment analyzer
+- Compound score (-1 to 1, negative to positive)
+- Individual positive, neutral, negative scores
+- Overall sentiment classification
+
+### Social Media Elements
+- Automatic hashtag detection (#hashtag)
+- Mention detection (@username)
+- Count and display of social elements
+
+### Engagement Suggestions
+- Content length optimization (20-100 words ideal)
+- Readability improvements for broad audience reach
+- Sentiment balance recommendations
+- Hashtag usage optimization (3-5 recommended)
+- Call-to-action suggestions
+- Question prompts for engagement
+- Emoji usage recommendations
+
+## Error Handling
+- File size limits (16MB maximum)
+- File type validation
+- OCR processing errors
+- Text extraction failures
+- Network error handling
+- User-friendly error messages
+
+## Browser Compatibility
+- Chrome/Chromium 60+
+- Firefox 55+
+- Safari 12+
+- Edge 79+
+
+## Security Features
+- File type validation
+- Secure filename handling
+- Temporary file cleanup
+- Input sanitization
+- CORS configuration
+
+## Performance Optimization
+- File size limits
+- Efficient text processing
+- Minimal dependencies
+- Responsive design
+- Loading states for better UX
 
 ## Future Enhancements
 - Multi-language support
@@ -152,6 +222,14 @@ Analyze text content directly
 - User accounts and history
 - API rate limiting
 - Advanced analytics dashboard
+
+## Deployment
+The application is ready for deployment on platforms like:
+- Heroku
+- Railway
+- DigitalOcean App Platform
+- AWS Elastic Beanstalk
+- Google Cloud Run
 
 ## Contributing
 1. Fork the repository
@@ -163,12 +241,5 @@ Analyze text content directly
 ## License
 This project is licensed under the MIT License.
 
-## Contact
-- **GitHub**: [Ananya-07-arch](https://github.com/yourusername)
-- **Email**: ananyasrivastava0304@gmail.com
-  
-
----
-
-*This project demonstrates full-stack development capabilities including document processing, natural language processing, and modern web application architecture.*
-
+## Support
+For issues and questions, please create an issue in the GitHub repository.
