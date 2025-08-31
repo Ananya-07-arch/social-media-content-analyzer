@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from flask_cors import CORS
+# from flask_cors import CORS  # Temporarily commented out
 import os
 from werkzeug.utils import secure_filename
 import PyPDF2
@@ -20,7 +20,7 @@ except LookupError:
     nltk.download('vader_lexicon')
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)  # Temporarily commented out
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -273,4 +273,5 @@ def internal_error(e):
     return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host="0.0.0.0", port=port)
